@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>预警</title>
+<link rel="stylesheet" href="css/Site.css" />
+<link rel="stylesheet" href="css/zy.all.css" />
+<link rel="stylesheet" href="css/font-awesome.min.css" />
+<link rel="stylesheet" href="css/amazeui.min.css" />
+<link rel="stylesheet" href="css/admin.css" />
+<script src="js/vue.js"></script>
+</head>
+
+<body>
+	<div class="dvcontent">
+		<div>
+			<!--tab start-->
+			<div class="tabs">
+				<div class="hd">
+					<ul>
+						<li class="on"
+							style="box-sizing: initial; -webkit-box-sizing: initial;">预警管理</li>
+					</ul>
+				</div>
+				<div class="bd">
+					<ul style="display: block; padding: 20px;">
+						<li>
+							<!--分页显示角色信息 start-->
+							<div id="dv1">
+															<script src="js/xlsx.full.min.js" async></script>
+								<script>
+									function fnExcelReport(elm, fn) {
+										var workbook = XLSX.utils
+												.table_to_book(elm);
+										//sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));  
+										// return (sa);
+										XLSX.writeFile(workbook, fn + ".xlsx");
+									}
+								</script>
+								<input type="button" id="expxls" value="导出excel"
+									style="float: right; margin-bottom: 24px; margin-left: 10px"
+									onclick="fnExcelReport(tbRecord,'库存预警')" /> 
+								<input type="button" id="refresh" value="刷新"
+									style="float: right; margin-bottom: 24px;" onclick="refresh()">
+								<table class="table" id="tbRecord">
+									<thead>
+										<tr>
+											<th>物料ID</th>
+											<th>物料名称</th>
+											<th>供应商</th>
+											<th>库存数量</th>
+											<th>最小库存</th>
+											<th>操作</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="(item, index) in computedList">
+											<td>{{ item.Mno }}</td>
+											<td>{{ item.Mname }}</td>
+											<td>{{ item.Sup }}</td>
+											<td>{{ item.Mqty }}</td>
+											<td>{{ item.SMin }}</td>
+											<td class="edit"><button>
+													<a
+														:href="'/inbound.html?Mno='+encodeURIComponent(item.Mno)"
+														style="color: #fff;"><i class="icon-edit bigger-120"></i>入库</a>
+												</button></td>
+										</tr>
+									</tbody>
+
+								</table>
+							</div> <!--分页显示角色信息 end-->
+						</li>
+					</ul>
+				</div>
+			</div>
+			<!--tab end-->
+
+		</div>
+
+		<script src="js/jquery-1.7.2.min.js" type="text/javascript"></script>
+		<script src="js/plugs/Jqueryplugs.js" type="text/javascript"></script>
+		<script src="js/_layout.js"></script>
+		<script src="js/plugs/jquery.SuperSlide.source.js"></script>
+
+		<script>
+			var num = 1;
+			$(function() {
+
+				$(".tabs").slide({
+					trigger : "click"
+				});
+
+			});
+			var invl = new Vue({
+				el : '#tbRecord',
+				data : {
+					list : [],
+					auth:""
+				},
+				computed : {
+					computedList : function() {
+						return this.list;
+					}
+				},
+				methods : {}
+			});
+			function refresh() {
+				fetch("/alertquery").then(function(response) {
+					response.json().then(function(text) {
+						invl.list = text;
+					});
+				});
+
+			}
+			refresh();
+
+			var btn_save = function() {
+				var pid = $("#RawMaterialsTypePageId  option:selected").val();
+				var name = $("#RawMaterialsTypeName").val();
+				var desc = $("#RawMaterialsTypeDescription").val();
+				var ramark = $("#Ramark").val();
+				$.ajax({
+					type : "post",
+					url : "/RawMaterialsType/AddRawMaterialsType",
+					data : {
+						name : name,
+						pid : pid,
+						desc : desc,
+						ramark : ramark
+					},
+					success : function(data) {
+						if (data > 0) {
+							$.jq_Alert({
+								message : "添加成功",
+								btnOktext : "确认",
+								dialogModal : true,
+								btnOkClick : function() {
+									//$("#RawMaterialsTypeName").val("");
+									//$("#RawMaterialsTypeDescription").val("");
+									//$("#Ramark").val("");                           
+									//page1();
+									location.reload();
+
+								}
+							});
+						}
+					}
+				});
+				alert(t);
+			}
+
+			var btn_edit = function(id) {
+				$.jq_Panel({
+					url : "/RawMaterialsType/EditRawMaterialsType?id=" + id,
+					title : "编辑分类",
+					dialogModal : true,
+					iframeWidth : 500,
+					iframeHeight : 400
+				});
+			}
+			var btn_delete = function(id) {
+				$.jq_Confirm({
+					message : "您确定要删除吗?",
+					btnOkClick : function() {
+
+					}
+				});
+			}
+		</script>
+	</div>
+</body>
+
+</html>

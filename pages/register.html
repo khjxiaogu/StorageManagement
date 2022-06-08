@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="css/register.css">
+<title>注册界面</title>
+</head>
+<body>
+
+	<form action="/register" id="register" class="register" method="post">
+		<p>Register</p>
+		<input type="text" placeholder="姓名" name="name" required> <input
+			type="text" placeholder="用户名" name="username" required> <input
+			type="password" placeholder="密码" name="userpwd" id="userpwd" required>
+		<input type="password" placeholder="确认密码" name="userpwd2"
+			id="userpwd2"> <input type="submit" class="btn" value="注  册" required>
+	</form>
+	<script>
+		register.addEventListener("submit", function(event) {
+			if (userpwd.value != userpwd2.value) {
+				event.preventDefault();
+				alert('两次密码输入不一致！');
+			}
+		}, false);
+	</script>
+</body>
+</html>
